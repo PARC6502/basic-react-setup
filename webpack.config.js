@@ -2,9 +2,15 @@
 // output defaults to ./dist/main.js for the main output file
 // and to the ./dist folder for any other generated file
 
-const webpack = require('webpack');
+const webpack = require("webpack")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+const devMode = process.env.NODE_ENV !== "production"
 
 module.exports = {
+  output: {
+    filename: devMode ? "js/[name].js" : "js/[name].[chunkhash:8].js",
+    path: __dirname + "/dist"
+  },
   module: {
     rules: [
       {
@@ -18,12 +24,24 @@ module.exports = {
     extensions: ["*", ".js", ".jsx"]
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
+    new HtmlWebpackPlugin({
+      template: __dirname + "/src/public/index.html",
+      filename: __dirname + "/dist/index.html",
+      inject: true,
+      hash: false,
+      minify: {
+        removeComments: devMode ? false : true,
+        collapseWhitespace: devMode ? false : true,
+        minifyJS: devMode ? false : true,
+        minifyCSS: devMode ? false : true
+      }
+    })
   ],
   devServer: {
     contentBase: "./dist"
   }
-};
+}
 
 // Config I may need later...
 // entry: './src/index.js',
